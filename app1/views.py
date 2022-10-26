@@ -25729,37 +25729,7 @@ def convert2(request,id):
     upd.shipmentdate = est.expirationdate
     upd.placeofsupply= est.placeofsupply
 
-    # upd.product = est.product
-    # upd.hsn = est.hsn
-    # upd.description =est.description
-    # upd.qty = est.qty
-    # upd.rate = est.rate
-    # upd.tax = est.tax
-    # upd.total = est.total
-        
-    # upd.product1 = est.product1
-    # upd.hsn1 = est.hsn1
-    # upd.description1 =est.description1
-    # upd.qty1 = est.qty1
-    # upd.rate1 =est.rate1
-    # upd.total1 = est.total1
-    # upd.tax1 =est.tax1
-
-    # upd.product2 =est.product2
-    # upd.hsn2 = est.hsn2
-    # upd.description2 = est.description2
-    # upd.qty2 = est.qty2
-    # upd.rate2 = est.rate2
-    # upd.total2 = est.total2
-    # upd.tax2 = est.tax2
-
-    # upd.product3 = est.product3
-    # upd.hsn3 = est.hsn3
-    # upd.description3  = est.description3
-    # upd.qty3 = est.qty3
-    # upd.rate3 = est.rate3
-    # upd.total3 = est.total3
-    # upd.tax3 = est.tax3
+    
     upd.taxamount = est.taxamount
 
     upd.reference_number = est.reference_number
@@ -27049,12 +27019,32 @@ def updateinvoice2(request, id):
         invoi.TCS = request.POST['TCS']
 
         if len(request.FILES) != 0:
-            if len(invoi.file) > 0  :
+            if len(invoi.file) != "default.jpg" :
                 os.remove(invoi.invoice.path)
                 
             invoi.file = request.FILES['file'],
 
         invoi.save()
+
+        product = request.POST.getlist("product[]")
+        hsn  = request.POST.getlist("hsn[]")
+        description = request.POST.getlist("description[]")
+        qty = request.POST.getlist("qty[]")
+        price = request.POST.getlist("price[]")
+        
+        tax = request.POST.getlist("tax[]")
+        total = request.POST.getlist("total[]")
+
+        invoiceid=invoice.objects.get(invoiceid =invoi.invoiceid)
+
+        if len(product)==len(hsn)==len(description)==len(qty)==len(price)==len(tax)==len(total) and product and hsn and description and qty and price and tax and total:
+            mapped=zip(product,hsn,description,qty,price,tax,total)
+            mapped=list(mapped)
+            for ele in mapped:
+                created = invoice_item.objects.get_or_create(product = ele[0],hsn=ele[1],description=ele[2],
+                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid)
+
+                
 
         # product = request.POST.getlist("product[]")
         # hsn  = request.POST.getlist("hsn[]")
@@ -27067,15 +27057,31 @@ def updateinvoice2(request, id):
 
         # invoiceid=invoice.objects.get(invoiceid =invoi.invoiceid)
 
+
+        # inv_item = invoice_item.objects.filter(invoice=invoiceid)
+
+
+        # print(inv_item)
         # if len(product)==len(hsn)==len(description)==len(qty)==len(price)==len(tax)==len(total) and product and hsn and description and qty and price and tax and total:
         #     mapped=zip(product,hsn,description,qty,price,tax,total)
         #     mapped=list(mapped)
-        #     for ele in mapped:
-        #         created = invoice_item.objects.get_or_create(product = ele[0],hsn=ele[1],description=ele[2],
-        #         qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid)
+            
+            
+        #     for i in inv_item:
+        #         for ele in mapped:
+        #             i.product = ele[0]
+        #             i.hsn=ele[1]
+        #             i.description=ele[2]
+        #             i.qty=ele[3]
+        #             i.price=ele[4]
+        #             i.tax=ele[5]
+        #             i.total=ele[6]
+        #             i.invoice=invoiceid
+        #             i.save()
+                    
+        #             print(inv_item)
 
-
-        return redirect('goinvoices')
+        return redirect('invoice_view',id)
     else:
         return redirect('goinvoices')
 
@@ -27611,14 +27617,66 @@ def getitems2(request):
     desp = item.sale_desc
     qty = item.stock
     price = item.sales_cost
+    gst = item.intra_st
+    sgst = item.inter_st
 
 
     
-    return JsonResponse({"status":" not",'hsn':hsn,'desp':desp,'qty':qty,'price':price,
+    return JsonResponse({"status":" not",'hsn':hsn,'desp':desp,'qty':qty,'price':price,'gst':gst,'sgst':sgst,
         
         })
+@login_required(login_url='regcomp')
+def estimate_add_file(request,id):
+    cmp1 = company.objects.get(id=request.session['uid'])
+    est = estimate.objects.get(estimateid=id,cid=cmp1)
 
+    if request.method == 'POST':
+        
+        if len(request.FILES) != 0:
+           
+            if est.file != "default.jpg":
+                 os.remove(est.file.path)
+                
+            est.file=request.FILES['file']
+        
+        est.save()
+        return redirect('estimate_view',id)
+      
 
+@login_required(login_url='regcomp')
+def sales_add_file(request,id):
+    cmp1 = company.objects.get(id=request.session['uid'])
+    sale = salesorder.objects.get(id=id,cid=cmp1)
+
+    if request.method == 'POST':
+        
+        if len(request.FILES) != 0:
+           
+            if sale.file != "default.jpg":
+                 os.remove(sale.file.path)
+                
+            sale.file=request.FILES['file']
+        
+        sale.save()
+        return redirect('estimate_view',id)
+      
+@login_required(login_url='regcomp')
+def invoice_add_file(request,id):
+    cmp1 = company.objects.get(id=request.session['uid'])
+    inv = invoice.objects.get(invoiceid=id,cid=cmp1)
+
+    if request.method == 'POST':
+        
+        if len(request.FILES) != 0:
+           
+            if inv.file != "default.jpg":
+                 os.remove(inv.file.path)
+                
+            inv.file=request.FILES['file']
+        
+        inv.save()
+        return redirect('invoice_view',id)
+      
 
 
 # Ananthakrishnanend

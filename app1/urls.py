@@ -499,6 +499,18 @@ urlpatterns = [
 
     path('getitems2',views.getitems2,name='getitems2'),
 
+
+    path('estimate_add_file/<int:id>',views.estimate_add_file,name='estimate_add_file'),
+
+    path('sales_add_file/<int:id>',views.sales_add_file,name='sales_add_file'),
+
+    path('invoice_add_file/<int:id>',views.invoice_add_file,name='invoice_add_file'),
+
+
+    
+
+
+   
     
 
 

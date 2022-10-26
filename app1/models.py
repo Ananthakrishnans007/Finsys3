@@ -351,7 +351,7 @@ class invoice(models.Model):
     status =models.CharField(max_length=150,choices=invoice_status,default='Draft')
 
     note = models.CharField(max_length=255,default='', null=True)
-    file = models.FileField(upload_to='invoice')
+    file = models.FileField(upload_to='invoice',default="default.jpg")
 
     IGST = models.CharField(max_length=100,default=0, null=True)
     CGST = models.CharField(max_length=100,default=0, null=True)
@@ -1092,8 +1092,8 @@ class estimate(models.Model):
     TCS =  models.CharField(max_length=100)
     subtotal = models.CharField(max_length=100)
     estimatetotal = models.CharField(max_length=100)
-    file = models.FileField(upload_to='estimate')
-    file_share = models.FileField(upload_to='estimate')
+    file = models.FileField(upload_to='estimate',default="default.jpg")
+    file_share = models.FileField(upload_to='estimate', default='')
 
     estimate_status = (
         ('Draft','Draft'),
@@ -1177,7 +1177,7 @@ class salesorder(models.Model):
     TCS =  models.CharField(max_length=100)
     salestotal = models.CharField(max_length=100)
     
-    file = models.FileField(upload_to='sales')
+    file = models.FileField(upload_to='sales',default="default.jpg")
 
     sale_status = (
         ('Draft','Draft'),
