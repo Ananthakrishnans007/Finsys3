@@ -362,6 +362,7 @@ class invoice(models.Model):
 
 class invoice_item(models.Model):
     invoice = models.ForeignKey(invoice,on_delete=models.CASCADE)
+    cid = models.ForeignKey(company,on_delete=models.CASCADE)
     product = models.CharField(max_length=100)
     hsn = models.CharField(max_length=100)
     description = models.CharField(max_length=100, default='')
@@ -1050,38 +1051,8 @@ class estimate(models.Model):
     estimateno = models.CharField(max_length=100)
     placeofsupply = models.CharField(max_length=100)
 
-    # product = models.CharField(max_length=100)
-    # hsn = models.CharField(max_length=100)
-    # description = models.CharField(max_length=100)
-    # qty = models.CharField(max_length=100)
-    # rate = models.CharField(max_length=100)
-    # total = models.CharField(max_length=100)
-    # tax = models.CharField(max_length=100, default='0')
     
-
-    # product1 = models.CharField(max_length=100, default='')
-    # hsn1 = models.CharField(max_length=100, default='')
-    # description1 = models.CharField(max_length=100, default='')
-    # qty1 = models.CharField(max_length=100, default='')
-    # rate1 = models.CharField(max_length=100, default='')
-    # total1 = models.CharField(max_length=100, default='')
-    # tax1 = models.CharField(max_length=100, default='0')
-
-    # product2 = models.CharField(max_length=100, default='')
-    # hsn2 = models.CharField(max_length=100, default='')
-    # description2 = models.CharField(max_length=100, default='')
-    # qty2 = models.CharField(max_length=100, default='')
-    # rate2 = models.CharField(max_length=100, default='')
-    # total2 = models.CharField(max_length=100, default='')
-    # tax2 = models.CharField(max_length=100, default='0')
-
-    # product3 = models.CharField(max_length=100, default='')
-    # hsn3 = models.CharField(max_length=100, default='')
-    # description3 = models.CharField(max_length=100, default='')
-    # qty3 = models.CharField(max_length=100, default='')
-    # rate3 = models.CharField(max_length=100, default='')
-    # total3 = models.CharField(max_length=100, default='')
-    # tax3 = models.CharField(max_length=100, default='0')
+   
 
     taxamount = models.CharField(max_length=100, default='')
     reference_number = models.CharField(max_length=100, default='')
@@ -1111,6 +1082,7 @@ class estimate(models.Model):
 
 class estimate_item(models.Model):
     estimate = models.ForeignKey(estimate, on_delete=models.CASCADE,null=True)
+    cid = models.ForeignKey(company, on_delete=models.CASCADE,null=True)
     item = models.CharField(max_length=255,default='')
     hsn =  models.CharField(max_length=255,default='')
     description = models.CharField(max_length=255,default='')
@@ -1133,39 +1105,7 @@ class salesorder(models.Model):
     placeofsupply = models.CharField(max_length=100)
 
 
-    # product = models.CharField(max_length=100)
-    # hsn = models.CharField(max_length=100)
-    # description = models.CharField(max_length=100)
-    # qty = models.CharField(max_length=100)
-    # rate = models.CharField(max_length=100)
-    # total = models.CharField(max_length=100)
-    # tax = models.CharField(max_length=100, default='0')
-
     
-    # product1 = models.CharField(max_length=100, default='')
-    # hsn1 = models.CharField(max_length=100, default='')
-    # description1 = models.CharField(max_length=100, default='')
-    # qty1 = models.CharField(max_length=100, default='')
-    # rate1 = models.CharField(max_length=100, default='')
-    # total1 = models.CharField(max_length=100, default='')
-    # tax1 = models.CharField(max_length=100, default='0')
-
-    # product2 = models.CharField(max_length=100, default='')
-    # hsn2 = models.CharField(max_length=100, default='')
-    # description2 = models.CharField(max_length=100, default='')
-    # qty2 = models.CharField(max_length=100, default='')
-    # rate2 = models.CharField(max_length=100, default='')
-    # total2 = models.CharField(max_length=100, default='')
-    # tax2 = models.CharField(max_length=100, default='0')
-
-    # product3 = models.CharField(max_length=100, default='')
-    # hsn3 = models.CharField(max_length=100, default='')
-    # description3 = models.CharField(max_length=100, default='')
-    # qty3 = models.CharField(max_length=100, default='')
-    # rate3 = models.CharField(max_length=100, default='')
-    # total3 = models.CharField(max_length=100, default='')
-    # tax3 = models.CharField(max_length=100, default='0')
-    # taxamount = models.CharField(max_length=100, default='')
 
     reference_number = models.CharField(max_length=100, default='')
     note = models.TextField()
@@ -1191,6 +1131,7 @@ class salesorder(models.Model):
 
 class sales_item(models.Model):
     salesorder= models.ForeignKey(salesorder,on_delete=models.CASCADE)
+    cid = models.ForeignKey(company, on_delete=models.CASCADE,default='')
     product = models.CharField(max_length=100)
     hsn = models.CharField(max_length=100)
     description = models.CharField(max_length=100, default='')

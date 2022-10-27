@@ -277,7 +277,9 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
 
                   {% for j in estimateitem %}
                   <tr id='addr0'>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ forloop.counter }}
+                      <input type="text"  name="id[]" value="{{ j.id }}" >
+                    </td>
                     <td>
                       <select name='product[]' id="product" class="form-control" style="background-color: #2f516f; color: white;">
 

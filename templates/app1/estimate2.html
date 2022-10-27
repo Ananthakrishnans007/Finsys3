@@ -217,6 +217,8 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     <td><input type="number" name='total[]' id="total1" placeholder=0 class="form-control total" value=0 step="any" readonly style="background-color: #2f516f; color: white;" /></td>
                     <td style="display: none;"><input type="number" step="any" name='taxamount1' id="taxamount1" class="form-control taxamount" />
                     </td>
+                    <td><button type="button" id="${roinc}" class="btn btn-danger remove_row">-
+</button></td>
                   </tr>
   
   `
@@ -226,9 +228,11 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
   });
   $(document).on('click','.remove_row',function(){
   var row_id = $(this).attr("id");
-  $('#row'+row_id+'').remove();
+  $('#addr0'+row_id+'').remove();
   });
   
+
+
     var place = document.getElementById('plosu').value;
   // $('#product').on('change', function() {
     $(document).on('click','#product',function(){
@@ -251,6 +255,8 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description').value = data1
                     document.getElementById('qtyspan').innerHTML = data2;
                     document.getElementById('unit1').value = data3
+
+                    
                     
                     
                     if (place == '{{ cmp1.state }}')
@@ -287,11 +293,22 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     data3 = response.price
                     data4 = response.gst
                     data5 = response.sgst
-                    
+                   
                     document.getElementById('hsn11').value = data
                     document.getElementById('description1').value = data1
                     document.getElementById('qtyspan1').innerHTML = data2;
                     document.getElementById('unit11').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr01').remove();
+                    
+                    
+                  }
+                    
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -329,6 +346,14 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description2').value = data1
                     document.getElementById('qtyspan2').innerHTML = data2;
                     document.getElementById('unit12').value = data3
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr02').remove();
+                    
+                    
+                  }
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -365,6 +390,14 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description3').value = data1
                     document.getElementById('qtyspan3').innerHTML = data2;
                     document.getElementById('unit13').value = data3
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr03').remove();
+                    
+                    
+                  }
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -400,6 +433,14 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description4').value = data1
                     document.getElementById('qtyspan4').innerHTML = data2;
                     document.getElementById('unit14').value = data3
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr04').remove();
+                    
+                    
+                  }
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -435,6 +476,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description5').value = data1
                     document.getElementById('qtyspan5').innerHTML = data2;
                     document.getElementById('unit15').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr05').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -471,6 +522,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description6').value = data1
                     document.getElementById('qtyspan6').innerHTML = data2;
                     document.getElementById('unit16').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr06').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -506,6 +567,14 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description7').value = data1
                     document.getElementById('qtyspan7').innerHTML = data2;
                     document.getElementById('unit17').value = data3
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr07').remove();
+                    
+                    
+                  }
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -542,6 +611,17 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('qtyspan8').innerHTML = data2;
                     document.getElementById('unit18').value = data3
                     
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr08').remove();
+                    
+                    
+                  }
+                    
+
+
                     if (place == '{{ cmp1.state }}')
                     {
                       document.getElementById('ta18').innerHTML = data4 + ' % GST';
@@ -576,6 +656,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description9').value = data1
                     document.getElementById('qtyspan9').innerHTML = data2;
                     document.getElementById('unit19').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr09').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -611,6 +701,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description10').value = data1
                     document.getElementById('qtyspan10').innerHTML = data2;
                     document.getElementById('unit110').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr010').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -646,6 +746,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description11').value = data1
                     document.getElementById('qtyspan11').innerHTML = data2;
                     document.getElementById('unit111').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr011').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -684,6 +794,15 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('qtyspan12').innerHTML = data2;
                     document.getElementById('unit112').value = data3
                     
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr012').remove();
+                    
+                    
+                  }
+                    
                     if (place == '{{ cmp1.state }}')
                     {
                       document.getElementById('ta112').innerHTML = data4 + ' % GST';
@@ -719,6 +838,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description13').value = data1
                     document.getElementById('qtyspan13').innerHTML = data2;
                     document.getElementById('unit113').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr013').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -754,6 +883,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description14').value = data1
                     document.getElementById('qtyspan14').innerHTML = data2;
                     document.getElementById('unit114').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr014').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -789,6 +928,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description15').value = data1
                     document.getElementById('qtyspan15').innerHTML = data2;
                     document.getElementById('unit115').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr015').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -825,6 +974,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description16').value = data1
                     document.getElementById('qtyspan16').innerHTML = data2;
                     document.getElementById('unit116').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr016').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -860,6 +1019,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description17').value = data1
                     document.getElementById('qtyspan17').innerHTML = data2;
                     document.getElementById('unit117').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr017').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -895,6 +1064,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description18').value = data1
                     document.getElementById('qtyspan18').innerHTML = data2;
                     document.getElementById('unit118').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr018').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -930,6 +1109,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description19').value = data1
                     document.getElementById('qtyspan19').innerHTML = data2;
                     document.getElementById('unit119').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr019').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -965,6 +1154,16 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     document.getElementById('description20').value = data1
                     document.getElementById('qtyspan20').innerHTML = data2;
                     document.getElementById('unit120').value = data3
+
+                    if (data2 == 0){
+                    
+                    alert("product Qty is zero");
+                    
+                    $('#addr020').remove();
+                    
+                    
+                  }
+                    
                     
                     if (place == '{{ cmp1.state }}')
                     {
@@ -1135,6 +1334,7 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     <th class="text-center">PRICE</th>
                     <th class="text-center">TAX (%)</th>
                     <th class="text-center">TOTAL</th>
+                 
                     
                   </tr>
                 </thead>
@@ -1183,7 +1383,7 @@ $('#baldue').val(parseFloat(x .toFixed(2)));
                     </td>
                     <td><input type="text" name='hsn[]' id="hsn1" placeholder='Enter HSN Code' class="form-control" style="background-color: #2f516f; color: white;" /></td>
                     <td><input type="text" name='description[]' id="description" placeholder='Description' class="form-control" style="background-color: #2f516f; color: white;" /></td>
-                    <td><input type="number" name='qty[]' onchange="qtychange1(this)" placeholder='Enter Qty' id="qty1" value=0 class="form-control qty" step=0 min=0 style="background-color: #2f516f; color: white;" />
+                    <td><input type="number" name='qty[]' onchange="qtychange1(this)" placeholder='Enter Qty' id="qty1"  class="form-control qty" step=0 min=0 style="background-color: #2f516f; color: white;" />
                       <span id="qtyspan" class='text-muted'></span>
                     </td>
                     <td><input type="number" name='price[]' id="unit1" placeholder='Enter Unit Price' class="form-control price" step="0.00" min="0" style="background-color: #2f516f; color: white;" /></td>

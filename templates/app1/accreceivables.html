@@ -31,9 +31,9 @@
                                     name="reportperiod" type="text">
                                 <option><span class="bx bx-right-arrow-alt"></span>All dates</option>
                                 <option><span class="bx bx-right-arrow-alt"></span>Custom</option>
-                                <option><span class="bx bx-right-arrow-alt"></span>Today</option>
+                                <!-- <option><span class="bx bx-right-arrow-alt"></span>Today</option>
                                 <option><span class="bx bx-right-arrow-alt"></span>This month</option>
-                                <option><span class="bx bx-right-arrow-alt"></span>This financial year</option>
+                                <option><span class="bx bx-right-arrow-alt"></span>This financial year</option> -->
                             </select>
                         </div>
                         <div class="col-sm-4" id="frdate" style="display: none;">
@@ -113,7 +113,7 @@
                                     {% for i in cust %}
                                         <tr  class="table-row " data-href="{% url 'account_transactions' i.customerid  %}">
                                             <td class="center text-dark">{{i.firstname}} {{i.firstname}}</td>
-                                            <td class="center text-dark">Invoice Balance Due</td>
+                                            <td class="center text-dark">Balance Due</td>
                                             <td class="center text-dark">{{i.receivables}}</td>
                                             <td class="center text-dark"></td>
                                             <td class="center text-dark"></td>
@@ -146,7 +146,7 @@
 
                                         </th>
                                         <th class="center font-weight-dark border-dark" style="color: black;"
-                                            id="t2"></th>
+                                            >{{sum}}</th>
                                         <th class="center font-weight-dark border-dark" style="color: black;"></th>
                                         <th class="center font-weight-dark border-dark" style="color: black;">
                                         </th>
@@ -155,7 +155,7 @@
                                         <th class="center font-weight-dark border-dark" style="color: black;">
                                         </th>
 
-                                        <th class="center font-weight-dark border-dark" style="color: black;" id="t1">
+                                        <th class="center font-weight-dark border-dark" style="color: black;" >{{sum}}
                                         </th>
 
 

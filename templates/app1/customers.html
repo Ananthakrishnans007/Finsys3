@@ -69,6 +69,13 @@ body{
                     <div class="card-title">
                         <center><h2 class="mb-0">CUSTOMERS</h2></center>
                         <hr>
+                        <div class="btn-group col-md-2" style="float: right;">
+                            
+                                <a class="btn btn-outline-info text-grey" onclick="ExportToExcel('xlsx')">Export To Excel</a>
+                            </div>
+
+                            
+                           
                     </div>
                 </div>
             </div>
@@ -77,7 +84,21 @@ body{
                     <div class="row">
 
                         
-                        
+                        <!-- <div class="col-md-4">
+                            <div class="wrap" style="width: 60%; margin-top: 8px;">
+                               
+                                <div class="search">
+                                    
+                                   <input type="text" id="searchfild" class="searchTerm" name="search">
+                                   <button type="submit" class="searchButton">
+                                     <i class="fa fa-search"></i>
+                                  </button>
+                                </div>
+                                
+                              
+                             </div>
+                             
+                        </div> -->
                         
                         <div class="col-md-4">
                             <div class="wrap" style="width: 60%; margin-top: 8px;">
@@ -143,19 +164,12 @@ body{
 
                         <div class="btn-group col-md-2">
                             <a href="{% url 'goaddcust' %}" id="myBtn" class="btn btn-outline-info text-grey" style="margin-top: 8px;" role="button">New</a>
-                            <button type="button"
-                                    class="btn btn-outline-info  dropdown-toggle dropdown-toggle-split"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-top: 8px;">
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <div class="dropdown-menu" style="margin-top: 8px;">
-                                <a class="dropdown-item" onclick="ExportToExcel('xlsx')">Export To Excel</a>
-                                
-                            </div>
+                            
                         </div>
 
                     </div>
                     <div class="container-fluid">
+                        
                         <table class="table table-responsive-md mt-4" id="tbl_exporttable_to_xls">
                             <thead>
                             <tr>

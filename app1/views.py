@@ -3390,7 +3390,17 @@ def invcreate2(request):
             mapped=list(mapped)
             for ele in mapped:
                 invoiceAdd,created = invoice_item.objects.get_or_create(product = ele[0],hsn=ele[1],description=ele[2],
-                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid)
+                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid,cid=cmp1)
+
+                itemqty = itemtable.objects.get(name=ele[0],cid=cmp1)
+                temp=0
+                temp = itemqty.stock 
+
+                temp = temp-int(ele[3])
+                itemqty.stock =temp
+                itemqty.save()
+
+
 
         return redirect('goinvoices')
     else:
@@ -14873,76 +14883,160 @@ def profitandlossfiltered(request):
 
 @login_required(login_url='regcomp')
 def accreceivables(request):
-    try:
+    
         cmp1 = company.objects.get(id=request.session["uid"])
 
         inv = invoice.objects.filter(cid=cmp1).values(
             'customername').annotate(t1=Sum('baldue'))
-        cre = credit.objects.filter(cid=cmp1).values(
-            'customer').annotate(t1=Coalesce(Sum('grndtot'), 0))
+        # cre = credit.objects.filter(cid=cmp1).values(
+        #     'customer').annotate(t1=Coalesce(Sum('grndtot'), 0))
         tot = invoice.objects.filter(
             cid=cmp1).all().aggregate(t2=Sum('baldue'))
 
         
 
-        tot1 = credit.objects.filter(
-            cid=cmp1).all().aggregate(t2=Sum('grndtot'))
+        # tot1 = credit.objects.filter(
+        #     cid=cmp1).all().aggregate(t2=Sum('grndtot'))
 
+        # custo = customer.objects.filter(cid=cmp1).all()
 
+        
 
         cust = customer.objects.filter(cid=cmp1)
+        
+        for i in cust:
+            custname = i.firstname +" "+i.lastname
+            
+            statment = cust_statment.objects.filter(customer=custname,cid=cmp1)
+            debit=0
+            credit=0
+            total1 = 0
+            
+            for j in statment :
+                if j.Amount:
+                    debit+=j.Amount
+                if j.Payments:
+                    credit+=j.Payments
 
+            total1=debit-credit
+           
+            i.receivables = total1
+            i.save()
+
+            sum=0
+            for i in  cust:
+                sum +=i.receivables
+
+            print(sum)    
         
 
 
         context = {'invoice': inv, 'cmp1': cmp1,
-                   'tot': tot, 'tot1': tot1, 'cre': cre,"cust":cust,}
+                   'tot': tot, 
+                #    'tot1': tot1,
+                    # 'cre': cre,
+                    "cust":cust,
+                    'sum':sum,
+                    }
         return render(request, 'app1/accreceivables.html', context)
-    except:
-        return redirect('godash')
-
+    
 
 @login_required(login_url='regcomp')
 def accreceivables1(request):
     try:
-        toda = date.today()
-        tod = toda.strftime("%Y-%m-%d")
+        # toda = date.today()
+        # tod = toda.strftime("%Y-%m-%d")
         filmeth = request.POST['reportperiod']
-        if filmeth == 'Today':
-            fromdate = tod
-            todate = tod
-        elif filmeth == 'Custom':
+        # if filmeth == 'Today':
+        #     fromdate = tod
+        #     todate = tod
+        if filmeth == 'Custom':
             fromdate = request.POST['fper']
             todate = request.POST['tper']
 
             print(fromdate)
 
 
-        elif filmeth == 'This month':
-            fromdate = toda.strftime("%Y-%m-01")
-            todate = toda.strftime("%Y-%m-31")
-        elif filmeth == 'This financial year':
-            if int(toda.strftime("%m")) >= 1 and int(toda.strftime("%m")) <= 3:
-                pyear = int(toda.strftime("%Y")) - 1
-                fromdate = f'{pyear}-03-01'
-                todate = f'{toda.strftime("%Y")}-03-31'
-            else:
-                pyear = int(toda.strftime("%Y")) + 1
-                fromdate = f'{toda.strftime("%Y")}-03-01'
-                todate = f'{pyear}-03-31'
+        # elif filmeth == 'This month':
+        #     fromdate = toda.strftime("%Y-%m-01")
+        #     todate = toda.strftime("%Y-%m-31")
+        # elif filmeth == 'This financial year':
+        #     if int(toda.strftime("%m")) >= 1 and int(toda.strftime("%m")) <= 3:
+        #         pyear = int(toda.strftime("%Y")) - 1
+        #         fromdate = f'{pyear}-03-01'
+        #         todate = f'{toda.strftime("%Y")}-03-31'
+        #     else:
+        #         pyear = int(toda.strftime("%Y")) + 1
+        #         fromdate = f'{toda.strftime("%Y")}-03-01'
+        #         todate = f'{pyear}-03-31'
         else:
             return redirect('accreceivables')
+        # cmp1 = company.objects.get(id=request.session["uid"])
+        # inv = invoice.objects.filter(cid=cmp1, invoicedate__gte=fromdate, invoicedate__lte=todate).values(
+        #     'customername').annotate(t1=Sum('baldue'))
+        # cre = credit.objects.filter(cid=cmp1, creditdate__gte=fromdate, creditdate__lte=todate).values(
+        #     'customer').annotate(t1=Coalesce(Sum('grndtot'), 0))
+        # tot = invoice.objects.filter(cid=cmp1, invoicedate__gte=fromdate, invoicedate__lte=todate).aggregate(
+        #     t2=Sum('baldue'))
+        # tot1 = credit.objects.filter(cid=cmp1, creditdate__gte=fromdate, creditdate__lte=todate).aggregate(
+        #     t2=Sum('grndtot'))
+        # context = {'invoice': inv, 'cmp1': cmp1,
+        #            'tot': tot, 'tot1': tot1, 'cre': cre}
+
         cmp1 = company.objects.get(id=request.session["uid"])
-        inv = invoice.objects.filter(cid=cmp1, invoicedate__gte=fromdate, invoicedate__lte=todate).values(
+
+        inv = invoice.objects.filter(cid=cmp1).values(
             'customername').annotate(t1=Sum('baldue'))
-        cre = credit.objects.filter(cid=cmp1, creditdate__gte=fromdate, creditdate__lte=todate).values(
-            'customer').annotate(t1=Coalesce(Sum('grndtot'), 0))
-        tot = invoice.objects.filter(cid=cmp1, invoicedate__gte=fromdate, invoicedate__lte=todate).aggregate(
-            t2=Sum('baldue'))
-        tot1 = credit.objects.filter(cid=cmp1, creditdate__gte=fromdate, creditdate__lte=todate).aggregate(
-            t2=Sum('grndtot'))
+        # cre = credit.objects.filter(cid=cmp1).values(
+        #     'customer').annotate(t1=Coalesce(Sum('grndtot'), 0))
+        tot = invoice.objects.filter(
+            cid=cmp1).all().aggregate(t2=Sum('baldue'))
+
+        
+
+        # tot1 = credit.objects.filter(
+        #     cid=cmp1).all().aggregate(t2=Sum('grndtot'))
+
+        # custo = customer.objects.filter(cid=cmp1).all()
+
+        
+
+        cust = customer.objects.filter(cid=cmp1)
+        
+        for i in cust:
+            custname = i.firstname +" "+i.lastname
+            
+            statment = cust_statment.objects.filter(customer=custname,cid=cmp1,Date__gte=fromdate,Date__lte=todate)
+            debit=0
+            credit=0
+            total1 = 0
+            
+            for j in statment :
+                if j.Amount:
+                    debit+=j.Amount
+                if j.Payments:
+                    credit+=j.Payments
+
+            total1=debit-credit
+           
+            i.receivables = total1
+            i.save()
+
+            sum=0
+            for i in  cust:
+                sum +=i.receivables
+
+            print(sum)    
+        
+
+
         context = {'invoice': inv, 'cmp1': cmp1,
-                   'tot': tot, 'tot1': tot1, 'cre': cre}
+                   'tot': tot, 
+                #    'tot1': tot1,
+                    # 'cre': cre,
+                    "cust":cust,
+                    'sum':sum,
+                    }
         return render(request, 'app1/accreceivables.html', context)
     except:
         return redirect('accreceivables')
@@ -25038,6 +25132,8 @@ def gosearch(request):
     else:
         return redirect('gocustomers')
 
+    
+
 @login_required(login_url='regcomp')
 def gocustomers1(request):
     try:
@@ -25383,7 +25479,7 @@ def estcreate2(request):
                 mapped=list(mapped)
                 for ele in mapped:
                     itemAdd,created = estimate_item.objects.get_or_create(item = ele[0],hsn=ele[1],description=ele[2],
-                    quantity=ele[3],rate=ele[4],tax=ele[5],total=ele[6] ,estimate = estimateid)
+                    quantity=ele[3],rate=ele[4],tax=ele[5],total=ele[6] ,estimate = estimateid,cid=cmp1)
 
 
 
@@ -25583,15 +25679,17 @@ def updateestimate2(request, id):
         rate = request.POST.getlist("price[]")
         tax = request.POST.getlist("tax[]")
         amount = request.POST.getlist("total[]")
+        estitemid = request.POST.getlist("id[]")
 
         estimateid= estimate.objects.get(estimateid=upd.estimateid)
 
-        if len(items)==len(hsn)==len(description)==len(quantity)==len(rate)==len(tax )==len(amount) and items and hsn and description and quantity and rate and tax and amount:
-                mapped=zip(items,hsn,description ,quantity,rate,tax,amount)
+        if len(items)==len(hsn)==len(description)==len(quantity)==len(rate)==len(tax )==len(amount)==len(estitemid) and items and hsn and description and quantity and rate and tax and amount and estitemid:
+                mapped=zip(items,hsn,description ,quantity,rate,tax,amount,estitemid)
                 mapped=list(mapped)
+                print(mapped)
                 for ele in mapped:
-                    itemAdd,created = estimate_item.objects.get_or_create(item = ele[0],hsn=ele[1],description=ele[2],
-                    quantity=ele[3],rate=ele[4],tax=ele[5],total=ele[6] ,estimate = estimateid)
+                    created = estimate_item.objects.filter(id=ele[7],cid=cmp1).update(item = ele[0],hsn=ele[1],description=ele[2],
+                    quantity=ele[3],rate=ele[4],tax=ele[5],total=ele[6])
                    
 
 
@@ -25762,6 +25860,7 @@ def convert2(request,id):
         a.price = i.rate
         a.total = i.total
         a.tax = i.tax
+        a.cid = i.cid
         a.save()
 
 
@@ -25898,7 +25997,7 @@ def createsales_record(request):
             mapped=list(mapped)
             for ele in mapped:
                 salesorderAdd,created = sales_item.objects.get_or_create(product = ele[0],hsn=ele[1],description=ele[2],
-                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],salesorder=salesorderid)
+                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],salesorder=salesorderid, cid=cmp1 )
 
 
 
@@ -26049,38 +26148,7 @@ def updatesale(request, id):
         upd.saledate = request.POST['Salesdate']
         upd.shipmentdate = request.POST['Shipmentdate']
         upd.placeofsupply= request.POST['placosupply']
-        # upd.product = request.POST['product']
-        # upd.hsn = request.POST['hsn']
-        # upd.description = request.POST['description']
-        # upd.qty = request.POST['qty']
-        # upd.rate = request.POST['rate']
-        # upd.tax = request.POST['tax']
-        # upd.total = request.POST['total']
-        
-        # upd.product1 = request.POST['product1']
-        # upd.hsn1 = request.POST['hsn1']
-        # upd.description1 = request.POST['description1']
-        # upd.qty1 = request.POST['qty1']
-        # upd.rate1 = request.POST['rate1']
-        # upd.total1 = request.POST['total1']
-        # upd.tax1 = request.POST['tax1']
-
-        # upd.product2 = request.POST['product2']
-        # upd.hsn2 = request.POST['hsn2']
-        # upd.description2 = request.POST['description2']
-        # upd.qty2 = request.POST['qty2']
-        # upd.rate2 = request.POST['rate2']
-        # upd.total2 = request.POST['total2']
-        # upd.tax2 = request.POST['tax2']
-
-        # upd.product3 = request.POST['product3']
-        # upd.hsn3 = request.POST['hsn3']
-        # upd.description3  = request.POST['description3']
-        # upd.qty3 = request.POST['qty3']
-        # upd.rate3 = request.POST['rate3']
-        # upd.total3 = request.POST['total3']
-        # upd.tax3 = request.POST['tax3']
-        # upd.taxamount = request.POST['taxamount']
+      
 
         upd.reference_number = request.POST['Ref_No']
         upd.note = request.POST['Note']
@@ -26093,7 +26161,7 @@ def updatesale(request, id):
         upd.salestotal = request.POST['grandtotal']
 
         if len(request.FILES) != 0:
-            if len(upd.file) > 0  :
+            if upd.file != "default.jpg" :
                 os.remove(upd.sales.path)
                 
             upd.file = request.FILES['file']
@@ -26101,9 +26169,32 @@ def updatesale(request, id):
         
 
         upd.save()
-        return redirect('goestimate')
+
+        product = request.POST.getlist("product[]")
+        hsn  = request.POST.getlist("hsn[]")
+        description = request.POST.getlist("description[]")
+        qty = request.POST.getlist("qty[]")
+        price = request.POST.getlist("price[]")
+        
+        tax = request.POST.getlist("tax[]")
+        total = request.POST.getlist("total[]")
+
+        itemid = request.POST.getlist("id[]")
+
+        saleid=salesorder.objects.get(id =upd.id)
+        # import pdb; pdb.set_trace()
+        if len(product)==len(hsn)==len(description)==len(qty)==len(price)==len(tax)==len(total)==len(itemid) and product and hsn and description and qty and price and tax and total and itemid:
+            mapped=zip(product,hsn,description,qty,price,tax,total,itemid)
+            mapped=list(mapped)
+           
+            for ele in mapped:
+                created = sales_item.objects.filter(id=ele[7],cid=cmp1).update(product = ele[0],hsn=ele[1],description=ele[2],
+                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6])
+
+
+        return redirect('gosalesorder')
     else:
-        return redirect('goestimate')
+        return redirect('gosalesorder')
 
 
 
@@ -26165,16 +26256,28 @@ def sale_convert2(request,id):
 
     salid = invoice.objects.get(invoiceid=inv.invoiceid)
     for i in sl:
+        
         a=invoice_item()
         a. invoice = salid 
         a.product = i.product
         a.hsn = i.hsn
         a.description = i.description
         a.qty  = i.qty
+
         a.price = i.price
         a.total = i.total
         a.tax = i.tax
+        a.cid = i.cid
         a.save()
+        print(i.product)
+        itemqty = itemtable.objects.get(name=i.product,cid=cmp1)
+        
+        temp=0
+        temp = itemqty.stock
+        temp = temp-i.qty
+        
+        itemqty.stock = temp 
+        itemqty.save()
 
 
 
@@ -27035,14 +27138,16 @@ def updateinvoice2(request, id):
         tax = request.POST.getlist("tax[]")
         total = request.POST.getlist("total[]")
 
-        invoiceid=invoice.objects.get(invoiceid =invoi.invoiceid)
+        itemid = request.POST.getlist("id[]")
 
-        if len(product)==len(hsn)==len(description)==len(qty)==len(price)==len(tax)==len(total) and product and hsn and description and qty and price and tax and total:
-            mapped=zip(product,hsn,description,qty,price,tax,total)
+        invoiceid=invoice.objects.get(invoiceid =invoi.invoiceid)
+        # import pdb; pdb.set_trace()
+        if len(product)==len(hsn)==len(description)==len(qty)==len(price)==len(tax)==len(total)==len(itemid) and product and hsn and description and qty and price and tax and total and itemid:
+            mapped=zip(product,hsn,description,qty,price,tax,total,itemid)
             mapped=list(mapped)
             for ele in mapped:
-                created = invoice_item.objects.get_or_create(product = ele[0],hsn=ele[1],description=ele[2],
-                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid)
+                created = invoice_item.objects.filter(id=ele[7],cid=cmp1).update(product = ele[0],hsn=ele[1],description=ele[2],
+                qty=ele[3],price=ele[4],tax=ele[5],total=ele[6])
 
                 
 
@@ -27403,7 +27508,10 @@ def search_payment_received(request):
             refno__istartswith=search_str,cid=cmp1)
            
         data =expenses .values()  
-        return JsonResponse(list(data),safe=False)   
+        return JsonResponse(list(data),safe=False) 
+
+        
+          
 
 
 def payment_view(request,id):
