@@ -27217,8 +27217,10 @@ def invoice_status(request,id):
     statment.cid = cmp1
     statment.inv =inoi
     
+    
     statment.Date = inoi.invoicedate
     statment.Transactions = "Invoice"
+    
     statment.Amount = inoi.grandtotal
     statment.save()
 
@@ -27420,6 +27422,8 @@ def paymentcreate2(request):
 
 
         invno = request.POST.getlist("invno[]")
+        invdate = request.POST.getlist("invdate[]")
+
         duedate = request.POST.getlist("duedate[]")
         invamount = request.POST.getlist("inv_amount[]")
         balamount = request.POST.getlist("openbal[]")
@@ -27427,8 +27431,8 @@ def paymentcreate2(request):
 
         payment_id=payment.objects.get(paymentid = pay2.paymentid )
 
-        if len(invno)==len(duedate)==len(invamount)==len(balamount)==len(paymentamount) and invno and duedate and invamount and balamount and paymentamount :
-            mapped=zip(invno,duedate,invamount,balamount,paymentamount)
+        if len(invno)==len(duedate)==len(invamount)==len(balamount)==len(paymentamount)==len(invdate) and invno and duedate and invamount and balamount and paymentamount and invdate :
+            mapped=zip(invno,duedate,invamount,balamount,paymentamount,invdate)
             mapped=list(mapped)
             for ele in mapped:
                 salesorderAdd,created = paymentitems.objects.get_or_create(
@@ -27437,8 +27441,10 @@ def paymentcreate2(request):
                     invamount=ele[2],
                     balamount=ele[3],
                     paymentamount=ele[4],
-                    
-                    payment=payment_id)
+                    payment=payment_id,
+                    cid = cmp1,
+                    invdate=ele[5],
+                     )
 
         pyit = paymentitems.objects.filter(payment=pay2.paymentid)
         print(pyit)
@@ -27534,6 +27540,108 @@ def payment_view(request,id):
     }
 
     return render(request,'app1/payment_view.html',context)
+
+
+
+
+def edit_payment(request,id):
+    cmp1 = company.objects.get(id=request.session["uid"])
+    pay = payment.objects.get(paymentid=id)
+    pk =  pay.customer 
+    x = pk.split()
+    x.append(" ")
+    a = x[0]
+    b = x[1]
+    if x[2] is not None:
+        b = x[1] + " " + x[2]
+        custobject = customer.objects.get(firstname=a, lastname=b, cid=cmp1)
+    payitem = paymentitems.objects.filter(payment=pay) 
+
+    count = paymentitems.objects.filter(payment=pay).count()
+    print(count)
+    context = {
+        'pay':pay ,
+        'cmp1':cmp1,
+        'custobject':custobject,
+        'payitem':payitem,
+        'count':count,
+    }
+
+    return render(request,'app1/payment_edit.html',context)
+
+
+
+def edit_payment2(request,id):
+    if request.method=='POST':
+        cmp1 = company.objects.get(id=request.session["uid"])
+        pay = payment.objects.get(paymentid=id,cid=cmp1)
+
+        pay.customer = request.POST['customername']
+        pay.email = request.POST['email']
+        pay.paymdate = request.POST['paymdate']
+        pay.pmethod = request.POST['pmethod']
+        
+        pay.depto = request.POST['depto']
+        pay.amtreceived = request.POST['amtreceived']
+        pay.amtapply = request.POST['amtapply']
+        pay.amtcredit = request.POST['amtcredit']
+        pay.referno = request.POST['ref']
+        pay.save()
+
+
+        invno = request.POST.getlist("invno[]")
+        invdate = request.POST.getlist("invdate[]")
+
+        duedate = request.POST.getlist("duedate[]")
+        invamount = request.POST.getlist("inv_amount[]")
+        balamount = request.POST.getlist("openbal[]")
+        paymentamount = request.POST.getlist("payment[]")
+
+        payitemid = request.POST.getlist("id[]")
+
+        payment_id=payment.objects.get(paymentid = pay.paymentid )
+
+        if len(invno)==len(duedate)==len(invamount)==len(balamount)==len(paymentamount)==len(invdate)==len(invdate) and invno and duedate and invamount and balamount and paymentamount and invdate and payitemid :
+            mapped=zip(invno,duedate,invamount,balamount,paymentamount,invdate,payitemid)
+            mapped=list(mapped)
+            for ele in mapped:
+                created = paymentitems.objects.filter(cid=cmp1,payment=ele[6]).update(
+                    invno = ele[0],
+                    duedate=ele[1],
+                    invamount=ele[2],
+                    balamount=ele[3],
+                    paymentamount=ele[4],
+                    invdate=ele[5],
+                     )
+
+        pyit = paymentitems.objects.filter(payment=pay.paymentid)
+        print(pyit)
+        amt =0
+        for m in pyit:
+            if m.balamount:
+                amt+=m.balamount
+        pay.balance = amt     
+        pay.save()
+
+
+        statment2=cust_statment.objects.get(cid=cmp1,pay=pay)
+        statment2.customer = pay.customer
+        statment2.cid = cmp1
+        statment2.Transactions = "Payment Received"
+    
+        statment2.Date = pay.paymdate
+        statment2.Payments = pay.amtapply
+        statment2.save()
+
+        return redirect('payment_view',id)
+
+
+    return redirect('payment_view',id)
+   
+
+
+
+
 
 
 def delete_payment(request,id):

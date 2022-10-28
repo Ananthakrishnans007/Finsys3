@@ -248,7 +248,7 @@
                                 `
                              <tr id='addr1' >
                                         <td>${i+1}</td>
-                                        <td><input type="text" name="invdate${i}" id=""
+                                        <td><input type="text" name="invdate[]" id=""
                                                    value="${data[i].invoicedate}" class="form-control"/><br>
                                             <input type="text" name="duedate[]" 
                                                    value="${data[i].duedate}"hidden> <span >duedate : ${data[i].duedate} </span>
@@ -278,7 +278,7 @@
               
             });
         });
-
+        
         function showinnum(divId, element) {
             if (element.value) {
                 document.getElementById(divId).innerHTML = element.value;

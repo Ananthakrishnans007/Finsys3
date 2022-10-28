@@ -489,6 +489,14 @@ urlpatterns = [
 
     path('payment_view/<int:id>',views.payment_view,name='payment_view'),
 
+    path('edit_payment/<int:id>',views.edit_payment,name='edit_payment'),
+
+    path('edit_payment2/<int:id>',views.edit_payment2,name='edit_payment2'),
+
+    
+
+    
+
     path('delete_payment/<int:id>',views.delete_payment,name='delete_payment'),
 
     path('search_resept/<int:id>',views.search_resept,name='search_resept'),

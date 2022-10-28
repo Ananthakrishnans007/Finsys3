@@ -207,7 +207,7 @@ body{
                                     </tr>
                                     {% for i in statment %}
                                     {% if i.cid_id == cmp1.cid %}
-                                    <tr class="table-row " data-href="" >
+                                    <tr >
                                         <td style="text-align: center;"> {{i.Date | date:'d-m-Y'}} </td>
                                         <td style="text-align: center;">Accounts Receivable</td>
                                         <td style="text-align: center;"> {{i.customer}}</td>
@@ -222,23 +222,51 @@ body{
                                         <td style="text-align: center;"> </td>
                                         <td style="text-align: center;"></td>
                                         <td style="text-align: center;">
+                                            {% if i.Transactions == "Customer Opening Balance" %}
+
                                             {% if i.Amount %}
-                                            {{i.Amount}}
+                                            {{i.Amount}} 
+                                            
+                                           
                                             {% endif %}
+                                            {% else %}
+                                            {% if i.Amount %}
+                                           
+                                            <a href="{% url 'invoice_view' i.inv.invoiceid   %}">{{i.Amount}} </a>
+                                            
+                                            
+                                            {% endif %}
+
+                                            {% endif %}
+
                                         </td>
                                         <td style="text-align: center;">
                                             {% if i.Payments %}
-                                            ₹{{i.Payments}}
+                                            <a href="{% url 'payment_view' i.pay.paymentid   %}">{{i.Payments}} </a>
+                                            
+
                                             {% endif %}</td>
+
+
                                         <td style="text-align: center;">
                                             {% if i.Transactions == "Invoice"  %}
 
-                                            {{i.Amount}} Dr
+                                            <a href="{% url 'invoice_view' i.inv.invoiceid   %}">{{i.Amount}} Dr </a>
                                             {% endif %}
                                             {% if i.Transactions == "Payment Received"  %}
-
-                                            {{i.Payments}} Cr
+                                            <a href="{% url 'payment_view' i.pay.paymentid   %}">{{i.Payments}}  Cr </a>
+                                            
                                             {% endif %}
+
+                                            {% if i.Transactions == "Customer Opening Balance" %}
+
+                                            {% if i.Amount %}
+                                            {{i.Amount}} Dr
+                                            
+                                           
+                                            {% endif %}
+                                            {% endif %}
+
                                         
                                         </td>
                                         
@@ -250,7 +278,7 @@ body{
                             {% endfor %}
 
                             {% if value != "" %}
-                            <tr class="table-row "  >
+                            <tr  >
                                 <td style="text-align: center;"> </td>
                                 <td colspan="2" style="text-align: center;">Total Debits and Credits 
 
@@ -276,7 +304,7 @@ body{
                             </tr>
                             {% endif %}
                             
-                            <tr class="table-row " data-href="" >
+                            <tr >
                                 <td style="text-align: center;"> As On 
                                     {% if ldate != "" %}
 
