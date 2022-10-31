@@ -714,7 +714,7 @@ def goaddsuppliers(request):
 
 @login_required(login_url='regcomp')
 def customers(request):
-    try:
+    
         cmp1 = company.objects.get(id=request.session["uid"])
         if request.method == "POST":
             firstname = request.POST['firstname']
@@ -740,14 +740,25 @@ def customers(request):
                                      shippincode=request.POST['shippincode'], shipcountry=request.POST['shipcountry'],
                                      cid=cmp1,
 
-                                     opening_balance = request.POST['openbalance'],
+                                    #  opening_balance = request.POST['openbalance'],
 
-                                     date= tod,
+                                     
                                      
                                      
                                      )
 
                 customer1.save()
+               
+                temp=request.POST['openbalance']
+                if temp != "":
+                    customer1.opening_balance = request.POST['openbalance'] 
+                    customer1.opening_balance_due = request.POST['openbalance'] 
+                    customer1.date= tod
+                    customer1.save()
+                    
+                   
+
+                
 
                 if customer1.opening_balance != "":
 
@@ -759,7 +770,7 @@ def customers(request):
 
                     
 
-                    Date = customer1.date,
+                    Date = tod,
 
                     Transactions="Customer Opening Balance",
 
@@ -767,7 +778,6 @@ def customers(request):
 
                 )
 
-                
 
                 add_cust_stat.save()
 
@@ -783,8 +793,7 @@ def customers(request):
         customers = customer.objects.filter(cid=cmp1).all()
         context = {'customers': customers, 'cmp1': cmp1}
         return render(request, 'app1/customers.html', context)
-    except:
-        return redirect('gocustomers')
+    
 
 
 @login_required(login_url='regcomp')
@@ -3393,12 +3402,13 @@ def invcreate2(request):
                 qty=ele[3],price=ele[4],tax=ele[5],total=ele[6],invoice=invoiceid,cid=cmp1)
 
                 itemqty = itemtable.objects.get(name=ele[0],cid=cmp1)
-                temp=0
-                temp = itemqty.stock 
+                if itemqty.stock != 0:
+                    temp=0
+                    temp = itemqty.stock 
 
-                temp = temp-int(ele[3])
-                itemqty.stock =temp
-                itemqty.save()
+                    temp = temp-int(ele[3])
+                    itemqty.stock =temp
+                    itemqty.save()
 
 
 
@@ -9537,10 +9547,24 @@ def getdatainv(request):
             b = x[1] + " " + x[2]
         custobject = customer.objects.values().filter(firstname=a, lastname=b, cid=cmp1)
         invitems = invoice.objects.values().filter(customername=id ,cid =cmp1,status='Approved' )
+
+        custopenblan = customer.objects.get(firstname=a,lastname=b,cid =cmp1)
+
+        if custopenblan.opening_balance != 0.0:
+
+            cust1 = customer.objects.get(firstname=a,lastname=b,cid =cmp1,opnbalance_status="Default")
+
+            date = cust1.date
+            opb = cust1.opening_balance
+            print(opb )
+            obdue = cust1.opening_balance_due
+
+            
+
         x_data = list(invitems)
         ct= list(custobject)
         
-        return JsonResponse({"status":" not","invitem":x_data,"ct":ct })
+        return JsonResponse({"status":" not","invitem":x_data,"ct":ct,'date':date,'opb':opb,'obdue':obdue,})
         # return redirect('goexpences')
 
 
@@ -14925,7 +14949,8 @@ def accreceivables(request):
 
             sum=0
             for i in  cust:
-                sum +=i.receivables
+                if i.receivables:
+                    sum +=i.receivables
 
             print(sum)    
         
@@ -25280,6 +25305,34 @@ def customer_profile(request,id):
      }
     return render(request, 'app1/customer_view.html', context)
 
+
+
+def update_opening_balance(request,id):
+    
+    if request.method == 'POST':
+        toda = date.today()
+        tod = toda.strftime("%Y-%m-%d")
+        cmp1 = company.objects.get(id=request.session["uid"])
+        cust = customer.objects.get(customerid=id,cid=cmp1)
+        cust.opening_balance = request.POST['openbalance']
+        cust.opening_balance_due = request.POST['openbalance']
+        cust.date = tod
+        cust.save()
+
+
+
+
+
+
+        return redirect('customer_profile',id)
+
+    return redirect('customer_profile',id)
+
+
+
+
+
+
 def search_resept(request,id):
     if request.method == 'POST':
         cmp1 = company.objects.get(id=request.session["uid"])
@@ -26271,13 +26324,14 @@ def sale_convert2(request,id):
         a.save()
         print(i.product)
         itemqty = itemtable.objects.get(name=i.product,cid=cmp1)
+    
+        if itemqty.stock != 0:
+            temp=0
+            temp = itemqty.stock
+            temp = temp-i.qty
         
-        temp=0
-        temp = itemqty.stock
-        temp = temp-i.qty
-        
-        itemqty.stock = temp 
-        itemqty.save()
+            itemqty.stock = temp 
+            itemqty.save()
 
 
 
@@ -27439,7 +27493,7 @@ def paymentcreate2(request):
                     invno = ele[0],
                     duedate=ele[1],
                     invamount=ele[2],
-                    balamount=ele[3],
+                    balamount=int(ele[3]) - int(ele[4]) ,
                     paymentamount=ele[4],
                     payment=payment_id,
                     cid = cmp1,
@@ -27478,25 +27532,35 @@ def paymentcreate2(request):
         # 
         paymetitem = paymentitems.objects.filter()
         
-        pay2.save()              
-        try:
-            for i in paymetitem:
+        pay2.save()
+
+        x = pay2.customer.split()
+        x.append(" ")
+        a = x[0]
+        b = x[1]
+        if x[2] is not None:
+            b = x[1] + " " + x[2]
+
+        
+        for i in paymetitem:
+            if i.invno != "Customer opening balance":
                 if invoice.objects.get(invoiceno=i.invno, cid=cmp1) and i.invno != 'undefined':
                     print(deposito)
                     invo = invoice.objects.get(invoiceno=i.invno, cid=cmp1)
                     invo.amtrecvd = int(invo.amtrecvd) + int(i.paymentamount)
-                    invo.baldue = float(i.balamount) - float(i.paymentamount)
+                    invo.baldue = float(i.balamount) 
                     if invo.baldue == 0.0:
                         invo.status = "Paid"
         
-                    invo.save()
-        
+                        invo.save()
+            if i.invno == "Customer opening balance":            
+                if customer.objects.get(firstname=a,lastname= b , cid=cmp1) and i.invno != 'undefined': 
+                    cust=customer.objects.get(firstname=a,lastname= b , cid=cmp1)
+                    cust.opening_balance_due = float(i.balamount)
+                    cust.opnbalance_status = "Paid"
+                    cust.save()
 
 
-
-        
-        except:
-            pass
         return redirect('gopayment_received')
     else:
         return redirect('gopayment_received')
@@ -27582,6 +27646,7 @@ def edit_payment2(request,id):
         pay.pmethod = request.POST['pmethod']
         
         pay.depto = request.POST['depto']
+        
         pay.amtreceived = request.POST['amtreceived']
         pay.amtapply = request.POST['amtapply']
         pay.amtcredit = request.POST['amtcredit']
@@ -27613,6 +27678,19 @@ def edit_payment2(request,id):
                     paymentamount=ele[4],
                     invdate=ele[5],
                      )
+                # invitems = invoice.objects.get(cid=cmp1,invoiceno=ele[0])
+                
+                # print(invitems)
+                # temp=0
+                # temp = invitems.baldue
+                # print(temp)
+                # tmp = int(ele[4])
+                
+                # temp = temp-tmp 
+                # print(temp)
+                # invitems.baldue = temp
+                # invitems.save() 
+
 
         pyit = paymentitems.objects.filter(payment=pay.paymentid)
         print(pyit)
@@ -27690,6 +27768,7 @@ def account_transactions(request,id):
             i.Balance = bal + i.Amount
             bal = i.Balance
         if i.Transactions =="Payment Received":
+            
             i.Balance = bal-i.Payments
             
 

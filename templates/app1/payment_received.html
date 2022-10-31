@@ -148,6 +148,9 @@
 
                                     </tr>
                                     </thead>
+                                    <tbody id='customerdata'>
+                                       
+                                    </tbody>
                                     <tbody id='invoicedata'>
                                        
                                     </tbody>
@@ -240,10 +243,79 @@
                 success:function(response){
                     console.log(response)
                     data = response.invitem
+                    date = response.date
+                    opb = response.opb 
+
+                    obdue = response.obdue
+
                     xt= response.ct
-                    for (i=0;i<data.length;i++){
+
+                    
+                   if (opb != null) {   
+                   $('#tab_logic #customerdata').append(
+
+                                `
+                             <tr id='addr1' >
+                                        <td>1</td>
+                                        <td><input type="text" name="invdate[]" id=""
+                                                   value="${date}" class="form-control"/><br>
+                                            <input type="text" name="duedate[]" 
+                                                   value="${date}"hidden> <span >duedate : ${date} </span>
+                                        </td>
+                                        <td><input type="text" name='invno[]' id="" value="Customer opening balance" 
+                                                   class="form-control"/></td>
+                                        <td><input type="text" name='inv_amount[]'
+                                            value="${opb}" id=""
+                                                   class="form-control qty" step="0" min="0"/></td>
+                                        <td><input type="number" name='openbal[]' id="openbal0"
+                                                value="${obdue}"
+                                                   class="form-control price" step="0.00" min="0"/></td>
+                                        <td><input type="number" name='payment[]' onchange="addagain()" id="payment0"
+                                                   placeholder='0.00'
+                                                   class="form-control total" value="0"/></td>
+                                    </tr>
+                                    `
+                                
+                            )
+                            
+                        
+                    for (i=0;i<6;i++){
                         j=i;
-                        $('#tab_logic tbody').append(
+                        $('#tab_logic #invoicedata').append(
+
+                                `
+                             <tr id='addr1' >
+                                        <td>${i+2}</td>
+                                        <td><input type="text" name="invdate[]" id=""
+                                                   value="${data[i].invoicedate}" class="form-control"/><br>
+                                            <input type="text" name="duedate[]" 
+                                                   value="${data[i].duedate}"hidden> <span >duedate : ${data[i].duedate} </span>
+                                        </td>
+                                        <td><input type="text" name='invno[]' id="" value="${data[i].invoiceno}" 
+                                                   class="form-control"/></td>
+                                        <td><input type="text" name='inv_amount[]'
+                                            value="${data[i].grandtotal}" id=""
+                                                   class="form-control qty" step="0" min="0"/></td>
+                                        <td><input type="number" name='openbal[]' id="openbal${i+1}"
+                                                value="${data[i].baldue}"
+                                                   class="form-control price" step="0.00" min="0"/></td>
+                                        <td><input type="number" name='payment[]' onchange="addagain()" id="payment${i+1}"
+                                                   placeholder='0.00'
+                                                   class="form-control total" value="0"/></td>
+                                    </tr>
+                                    `
+                                
+                            )
+                            
+                            
+
+
+                    }
+                } 
+                else{
+                    for (i=0;i<7;i++){
+                        j=i;
+                        $('#tab_logic #invoicedata').append(
 
                                 `
                              <tr id='addr1' >
@@ -273,6 +345,7 @@
 
 
                     }
+                }
                     document.getElementById('email').value = xt[0].email
                 }
               

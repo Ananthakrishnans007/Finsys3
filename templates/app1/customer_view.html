@@ -541,9 +541,42 @@
                                 </tbody>
 
                             </table>
+
+
+                            <div class="row ml-0 mt-6"><a data-toggle="modal" data-target="#openmodal" style="margin-top: 15px; margin-bottom: 10px; margin-left: 20px; cursor: pointer;  font-size: 16px;">View Opening Balance</a></div>
                 </div>
 
                 </div>
+
+                <!-- openbalance modal -->
+                <div class="modal fade" id="openmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Edit Opening Balance</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form method="POST" action="{% url 'update_opening_balance' customer.customerid %}">{% csrf_token %}
+                        <div class="modal-body">
+                          <input type="number" class="form-control" value="{{customer.opening_balance}}" name="openbalance">
+
+                        </div>
+                        <div class="modal-footer">
+                          
+                          <button type="submit" class="btn btn-primary">Edit</button>
+                        </div>
+                    </form>
+                      </div>
+                    </div>
+                  </div>
+                 <!-- openbalance modal -->
+            
+
+
+
+
 
                 <div id="statment" style="display: none;">
 

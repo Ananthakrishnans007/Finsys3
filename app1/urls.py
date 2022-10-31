@@ -514,6 +514,11 @@ urlpatterns = [
 
     path('invoice_add_file/<int:id>',views.invoice_add_file,name='invoice_add_file'),
 
+    path('update_opening_balance/<int:id>',views.update_opening_balance,name='update_opening_balance'),
+
+
+    
+
 
     
 

@@ -65,7 +65,9 @@ class customer(models.Model):
     shippincode = models.CharField(max_length=100, null=True)
     shipcountry = models.CharField(max_length=100, null=True)
     opening_balance = models.FloatField(null=True)
+    opening_balance_due = models.FloatField(null=True)
     date = models.DateField(null=True)
+    opnbalance_status = models.CharField(max_length=100,default='Default')
     
 
     customer_status = (
@@ -1163,6 +1165,7 @@ class payment(models.Model):
 class paymentitems(models.Model):
     payment = models.ForeignKey(payment,on_delete=models.CASCADE)
     cid = models.ForeignKey(company, on_delete=models.CASCADE,null=True)
+    # inv = models.ForeignKey(invoice, on_delete=models.CASCADE,null=True)
     invdate = models.CharField(max_length=100, default='')
     invno = models.CharField(max_length=100, default='')
     duedate = models.CharField(max_length=100, default='')
