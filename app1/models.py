@@ -360,7 +360,8 @@ class invoice(models.Model):
     SGST = models.CharField(max_length=100,default=0, null=True)
     TCS = models.CharField(max_length=100,default=0, null=True)
 
-    # add_open_invoice = models.FloatField()
+
+    gsttype = models.CharField(max_length=100,null=True)
 
 class invoice_item(models.Model):
     invoice = models.ForeignKey(invoice,on_delete=models.CASCADE)
