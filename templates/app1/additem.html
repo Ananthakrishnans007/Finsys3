@@ -361,15 +361,10 @@
                                                                 <label for="validationCustom05" style="color: white;">HSN
                                                                     Code</label>
                                                             <input type="text" name="hsn" class="form-control" 
-                                                            pattern="[0-9]{8}" maxlength="8" title=" Maximum 8 digits, characters not allowed"
                                                                        style="background-color: #2a4964; color: white;"
                                                                       
                                                                        placeholder="Enter a valid HSN code" required>
-                                                                <a href="https://www.cbic.gov.in/resources//htdocs-cbec/gst/goods-rates-booklet-03July2017.pdf"
-                                                                   target="_blank" style="font-style: italic"><h6
-                                                                        class="form-card mt-1" style="color: #3dd5f3">Not sure
-                                                                    about HSN
-                                                                    code..? click here</h6></a>
+                                                              
                                                             </div>
                                                            
                                                         </div>
@@ -390,7 +385,7 @@
                                                 <div class="form-check mt-1">
                                                    
                                                         <input class="form-check-input" name="taxref" type="checkbox" id="inclusive"
-                                                             value="taxable"  >taxable
+                                                             value="taxable" checked >taxable
                                                         <label style="color: white;">
                                                             </label>
                                                   
@@ -414,8 +409,9 @@
                                                        <input type="text" class="form-control" value="INR"
                                                         style="margin-left:20px;width:60px;background-color: #2a4960; color: white;"></div>
                                                        <div >
-                                                       <input type="text" name="pcost" class="form-control"
+                                                       <input type="number" name="pcost" class="form-control"
                                                        id="purprice" style="width:540px;background-color: #2a4964; color: white;"
+                                                       value="0"
                                                        >
                                                        </div>
                                                     </div>
@@ -432,6 +428,7 @@
                                                         <div >
                                                        <input type="text" name="salesprice" class="form-control"
                                                        id="saleprice" style="width:540px;background-color: #2a4964; color: white;"
+                                                       value="0"
                                                        >
                                                         </div>
                                                     </div>
@@ -485,7 +482,7 @@
                                                                    ></textarea>
                                                         </div>
                                                     </div>
-                                        <div class="row">
+                                        <!--<div class="row">
                                             
                                             <div class="col-md-12 mt-3"><center>
                                                 <label 
@@ -523,7 +520,7 @@
                                                     <option value="Out of Scope">Out of Scope(0%)</option>
                                                 </select></center>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         
                                         <div class="row">
                                             <div class="col-md-12 mx-0">
@@ -615,7 +612,7 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="form-check">
-                                                            <input class="form-check-input" value="Active" type="radio" name="status" id="flexRadioDefault1">
+                                                            <input class="form-check-input" value="Active" type="radio" name="status" id="flexRadioDefault1" checked>
                                                             <label class="form-check-label" for="flexRadioDefault1">
                                                               Active
                                                             </label>
@@ -791,9 +788,6 @@
 
        
     {% endif %}
-
-
-
 
 
 {% endblock %}

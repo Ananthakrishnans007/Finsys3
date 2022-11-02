@@ -1,4 +1,4 @@
-from asyncio.windows_events import NULL
+
 from curses.ascii import HT
 from http.client import HTTPResponse
 from multiprocessing import context
@@ -25494,8 +25494,17 @@ def estindex2(request):
         noninv = noninventory.objects.filter(cid=cmp1).all()
         ser = service.objects.filter(cid=cmp1).all()
         item = itemtable.objects.filter(cid=cmp1).all()
+
+        unit = unittable.objects.filter(cid=cmp1)
+        acc  = accounts1.objects.filter(acctype='Cost of Goods Sold',cid=cmp1)
+        acc1  = accounts1.objects.filter(acctype='Sales',cid=cmp1)
+
+
+
         context = {'est': est1, 'customers': customers, 'cmp1': cmp1, 'inv': inv, 'bun': bun, 'noninv': noninv,'item':item,
-                   'ser': ser, 'tod': tod}
+                   'ser': ser, 'tod': tod,
+                   'unit':unit,'acc':acc,'acc1':acc1,
+                   }
         return render(request, 'app1/estimate2.html', context)
     except:
         return redirect('goestimate')
@@ -25622,21 +25631,21 @@ def estimate_create_item(request):
             itax = request.POST['taxref']
             ipcost = request.POST['pcost']
             iscost = request.POST['salesprice']
-            itrate = request.POST['tax']
+            #itrate = request.POST['tax']
             ipuracc = request.POST['pur_account']
             isalacc = request.POST['sale_account']
             ipurdesc = request.POST['pur_desc']
             isaledesc = request.POST['sale_desc']
             iintra = request.POST['intra_st']
             iinter = request.POST['inter_st']
-            iinv = request.POST['invacc']
-            istock = request.POST['stock']
+            iinv = request.POST.get('invacc')
+            istock = request.POST.get('stock')
             istatus = request.POST['status']
             item = itemtable(name=iname,item_type=itype,unit=iunit,
                                 hsn=ihsn,tax_reference=itax,
                                 purchase_cost=ipcost,
                                 sales_cost=iscost,
-                                tax_rate=itrate,
+                                #tax_rate=itrate,
                                 acount_pur=ipuracc,
                                 account_sal=isalacc,
                                 pur_desc=ipurdesc,
@@ -26007,8 +26016,19 @@ def newsalesorder(request):
     noninv = noninventory.objects.filter(cid=cmp1).all()
     ser = service.objects.filter(cid=cmp1).all()
     item = itemtable.objects.filter(cid=cmp1).all()
+
+    unit = unittable.objects.filter(cid=cmp1)
+    acc  = accounts1.objects.filter(acctype='Cost of Goods Sold',cid=cmp1)
+    acc1  = accounts1.objects.filter(acctype='Sales',cid=cmp1)
+
+
+
+
+
     context = {'sel1': sel1, 'customers': customers, 'cmp1': cmp1, 'inv': inv, 'bun': bun, 'noninv': noninv,'item':item,
-                   'ser': ser, 'tod': tod}
+                   'ser': ser, 'tod': tod,
+                   'unit':unit,'acc':acc,'acc1':acc1,
+                   }
         
     print(sel1)
 
@@ -26093,6 +26113,8 @@ def new_customers2(request):
     try:
         cmp1 = company.objects.get(id=request.session["uid"])
         if request.method == "POST":
+            toda = date.today()
+            tod = toda.strftime("%Y-%m-%d")
             firstname = request.POST['firstname']
             lastname = request.POST['lastname']
             if customer.objects.filter(firstname=firstname, lastname=lastname, cid=cmp1).exists():
@@ -26115,6 +26137,38 @@ def new_customers2(request):
                                      cid=cmp1)
 
                 customer1.save()
+                temp=request.POST['openbalance']
+                if temp != "":
+                    customer1.opening_balance = request.POST['openbalance'] 
+                    customer1.opening_balance_due = request.POST['openbalance'] 
+                    customer1.date= tod
+                    customer1.save()
+                    
+                   
+
+                
+
+                if customer1.opening_balance != "":
+
+                    add_cust_stat=cust_statment(
+
+                    customer = customer1.firstname +" "+ customer1.lastname,
+
+                    cid  = cmp1,
+
+                    
+
+                    Date = tod,
+
+                    Transactions="Customer Opening Balance",
+
+                    Amount= customer1.opening_balance,
+
+                )
+
+
+                add_cust_stat.save()
+
                 return redirect('newsalesorder')
         customers = customer.objects.filter(cid=cmp1).all()
         context = {'customers': customers, 'cmp1': cmp1}
@@ -26138,21 +26192,21 @@ def sale_create_item(request):
             itax = request.POST['taxref']
             ipcost = request.POST['pcost']
             iscost = request.POST['salesprice']
-            itrate = request.POST['tax']
+            #itrate = request.POST['tax']
             ipuracc = request.POST['pur_account']
             isalacc = request.POST['sale_account']
             ipurdesc = request.POST['pur_desc']
             isaledesc = request.POST['sale_desc']
             iintra = request.POST['intra_st']
             iinter = request.POST['inter_st']
-            iinv = request.POST['invacc']
-            istock = request.POST['stock']
+            iinv = request.POST.get('invacc')
+            istock = request.POST.get('stock')
             istatus = request.POST['status']
             item = itemtable(name=iname,item_type=itype,unit=iunit,
                                 hsn=ihsn,tax_reference=itax,
                                 purchase_cost=ipcost,
                                 sales_cost=iscost,
-                                tax_rate=itrate,
+                                #tax_rate=itrate,
                                 acount_pur=ipuracc,
                                 account_sal=isalacc,
                                 pur_desc=ipurdesc,
@@ -26457,9 +26511,18 @@ def goaddinvoices(request):
         noninv = noninventory.objects.filter(cid=cmp1)
         ser = service.objects.filter(cid=cmp1)
         item = itemtable.objects.filter(cid=cmp1).all()
+
+        unit = unittable.objects.filter(cid=cmp1)
+        acc  = accounts1.objects.filter(acctype='Cost of Goods Sold',cid=cmp1)
+        acc1  = accounts1.objects.filter(acctype='Sales',cid=cmp1)
+
+
+
         context = {'cmp1': cmp1, 'customers': customers, 'inv': inv, 'bun': bun, 'noninv': noninv,'item' :item,
                    'ser': ser,
-                   'tod': tod}
+                   'tod': tod,
+                   'unit':unit,'acc':acc,'acc1':acc1,
+                   }
         return render(request, 'app1/addinvoics.html', context)
     except:
         return redirect('goinvoices')       
@@ -26494,6 +26557,8 @@ def new_customers3(request):
     try:
         cmp1 = company.objects.get(id=request.session["uid"])
         if request.method == "POST":
+            toda = date.today()
+            tod = toda.strftime("%Y-%m-%d")
             firstname = request.POST['firstname']
             lastname = request.POST['lastname']
             if customer.objects.filter(firstname=firstname, lastname=lastname, cid=cmp1).exists():
@@ -26516,6 +26581,43 @@ def new_customers3(request):
                                      cid=cmp1)
 
                 customer1.save()
+
+               
+                temp=request.POST['openbalance']
+                if temp != "":
+                    customer1.opening_balance = request.POST['openbalance'] 
+                    customer1.opening_balance_due = request.POST['openbalance'] 
+                    customer1.date= tod
+                    customer1.save()
+                    
+                   
+
+                
+
+                if customer1.opening_balance != "":
+
+                    add_cust_stat=cust_statment(
+
+                    customer = customer1.firstname +" "+ customer1.lastname,
+
+                    cid  = cmp1,
+
+                    
+
+                    Date = tod,
+
+                    Transactions="Customer Opening Balance",
+
+                    Amount= customer1.opening_balance,
+
+                )
+
+
+                add_cust_stat.save()
+
+
+
+
                 return redirect('goaddinvoices')
         customers = customer.objects.filter(cid=cmp1).all()
         context = {'customers': customers, 'cmp1': cmp1}
@@ -27348,6 +27450,80 @@ def goinvoices3(request):
     
     return redirect('goinvoices')
 
+
+@login_required(login_url='regcomp')
+def new_customers1(request):
+    try:
+        cmp1 = company.objects.get(id=request.session["uid"])
+        if request.method == "POST":
+            toda = date.today()
+            tod = toda.strftime("%Y-%m-%d")
+            firstname = request.POST['firstname']
+            lastname = request.POST['lastname']
+            if customer.objects.filter(firstname=firstname, lastname=lastname, cid=cmp1).exists():
+                messages.info(request,
+                              f"Customer {firstname} {lastname} already exists. Please provide a different name.")
+                return redirect('gocustomers')
+            else:
+                customer1 = customer(title=request.POST['title'], firstname=request.POST['firstname'],
+                                     lastname=request.POST['lastname'], company=request.POST['company'],
+                                     location=request.POST['location'], gsttype=request.POST['gsttype'],
+                                     gstin=request.POST['gstin'], panno=request.POST['panno'],
+                                     email=request.POST['email'],
+                                     website=request.POST['website'], mobile=request.POST['mobile'],
+                                     street=request.POST['street'], city=request.POST['city'],
+                                     state=request.POST['state'],
+                                     pincode=request.POST['pincode'], country=request.POST['country'],
+                                     shipstreet=request.POST['shipstreet'], shipcity=request.POST['shipcity'],
+                                     shipstate=request.POST['shipstate'],
+                                     shippincode=request.POST['shippincode'], shipcountry=request.POST['shipcountry'],
+                                     cid=cmp1)
+
+                customer1.save()
+
+               
+                temp=request.POST['openbalance']
+                if temp != "":
+                    customer1.opening_balance = request.POST['openbalance'] 
+                    customer1.opening_balance_due = request.POST['openbalance'] 
+                    customer1.date= tod
+                    customer1.save()
+                    
+                   
+
+                
+
+                if customer1.opening_balance != "":
+
+                    add_cust_stat=cust_statment(
+
+                    customer = customer1.firstname +" "+ customer1.lastname,
+
+                    cid  = cmp1,
+
+                    
+
+                    Date = tod,
+
+                    Transactions="Customer Opening Balance",
+
+                    Amount= customer1.opening_balance,
+
+                )
+
+
+                add_cust_stat.save()
+
+
+
+
+                return redirect('estindex2')
+        customers = customer.objects.filter(cid=cmp1).all()
+        context = {'customers': customers, 'cmp1': cmp1}
+        return render(request, 'app1/customers.html', context)
+    except:
+        return redirect('estindex2')    
+
 def inv_create_item(request):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
@@ -27364,21 +27540,21 @@ def inv_create_item(request):
             itax = request.POST['taxref']
             ipcost = request.POST['pcost']
             iscost = request.POST['salesprice']
-            itrate = request.POST['tax']
+            #itrate = request.POST['tax']
             ipuracc = request.POST['pur_account']
             isalacc = request.POST['sale_account']
             ipurdesc = request.POST['pur_desc']
             isaledesc = request.POST['sale_desc']
             iintra = request.POST['intra_st']
             iinter = request.POST['inter_st']
-            iinv = request.POST['invacc']
-            istock = request.POST['stock']
+            iinv = request.POST.get('invacc')
+            istock = request.POST.get('stock')
             istatus = request.POST['status']
             item = itemtable(name=iname,item_type=itype,unit=iunit,
                                 hsn=ihsn,tax_reference=itax,
                                 purchase_cost=ipcost,
                                 sales_cost=iscost,
-                                tax_rate=itrate,
+                                #tax_rate=itrate,
                                 acount_pur=ipuracc,
                                 account_sal=isalacc,
                                 pur_desc=ipurdesc,
@@ -28001,6 +28177,289 @@ def invoice_add_file(request,id):
         return redirect('invoice_view',id)
       
 
+def gstr11(request):
+    cmp1 = company.objects.get(id=request.session["uid"])
+    if request.method=='POST':
+        current_year = date.today().year
+        
+        next_year = current_year+1
+        print(next_year)
+
+        option = request.POST['option']
+
+        if option == 'All':
+            return redirect('gstr1')
+
+        if option == 'March-May':
+            invoices = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).count()
+            cgst = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+                                                         
+
+            invoices1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).count()
+            cgst1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).count()
+            cgst2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+            invoices3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).count()
+            cgst3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).count()
+            cgst4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=3,invoicedate__month__lte=5).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))                                                                                                            
+
+    
+    
+   
+    
+            c =invoices+invoices1+invoices2+invoices3+invoices4
+    
+
+        
+
+            context = {'cmp1':cmp1,
+            'invoices':invoices,'cgst':cgst,
+            'invoices1':invoices1,'cgst1':cgst1,
+            'invoices2':invoices2,'cgst2':cgst2,
+            'invoices3':invoices3,'cgst3':cgst3,
+            'invoices4':invoices4,'cgst4':cgst4,
+            'c':c,
+    
+    
+            }
+            return render(request, 'app1/gstr1.html', context)
+        if option == 'June-August':
+           
+
+            invoices = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).count()
+            cgst = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+                                                         
+
+            invoices1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).count()
+            cgst1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).count()
+            cgst2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+            invoices3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).count()
+            cgst3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).count()
+            cgst4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=6,invoicedate__month__lte=8).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))                                                                                                            
+
+    
+    
+   
+    
+            c =invoices+invoices1+invoices2+invoices3+invoices4
+    
+
+        
+
+            context = {'cmp1':cmp1,
+            'invoices':invoices,'cgst':cgst,
+            'invoices1':invoices1,'cgst1':cgst1,
+            'invoices2':invoices2,'cgst2':cgst2,
+            'invoices3':invoices3,'cgst3':cgst3,
+            'invoices4':invoices4,'cgst4':cgst4,
+            'c':c,
+    
+    
+            }
+            return render(request, 'app1/gstr1.html', context)
+        if option == 'September-November':
+           
+
+            invoices = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).count()
+            cgst = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+                                                         
+
+            invoices1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).count()
+            cgst1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).count()
+            cgst2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+            invoices3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).count()
+            cgst3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).count()
+            cgst4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year=current_year,invoicedate__month__gte=9,invoicedate__month__lte=11).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))                                                                                                            
+
+    
+    
+   
+    
+            c =invoices+invoices1+invoices2+invoices3+invoices4
+    
+
+        
+
+            context = {'cmp1':cmp1,
+            'invoices':invoices,'cgst':cgst,
+            'invoices1':invoices1,'cgst1':cgst1,
+            'invoices2':invoices2,'cgst2':cgst2,
+            'invoices3':invoices3,'cgst3':cgst3,
+            'invoices4':invoices4,'cgst4':cgst4,
+            'c':c,
+    
+    
+            }
+            return render(request, 'app1/gstr1.html', context) 
+
+        if option == 'December-February':
+           
+
+            invoices = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).count()
+            cgst = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-registered-Regular',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+                                                         
+
+            invoices1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).count()
+            cgst1 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='GST-unregistered',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).count()
+            cgst2 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='Overseas',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))
+            invoices3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).count()
+            cgst3 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype='SEZ',invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal')) 
+            invoices4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).count()
+            cgst4 = invoice.objects.filter(cid=cmp1,status='Approved',gsttype="Deemed exports - EOU's STP's EHTP's etc",invoicedate__year__gte=current_year,invoicedate__year__lte=next_year,invoicedate__month__gte=12,invoicedate__month__lte=2).aggregate(total_cgst=Sum('CGST'),
+                                                           total_igst=Sum('IGST'),
+                                                           total_sgst=Sum('SGST'),
+                                                           total_amt=Sum('subtotal'),
+                                                           total_tcs=Sum('TCS'),
+                                                           taxbaleamt = Sum('CGST')+Sum('IGST')+Sum('SGST')+Sum('TCS'),
+                                                           total_invamt=Sum('grandtotal'))                                                                                                            
+
+    
+    
+   
+    
+            c =invoices+invoices1+invoices2+invoices3+invoices4
+    
+
+        
+
+            context = {'cmp1':cmp1,
+            'invoices':invoices,'cgst':cgst,
+            'invoices1':invoices1,'cgst1':cgst1,
+            'invoices2':invoices2,'cgst2':cgst2,
+            'invoices3':invoices3,'cgst3':cgst3,
+            'invoices4':invoices4,'cgst4':cgst4,
+            'c':c,
+    
+    
+            }
+            return render(request, 'app1/gstr1.html', context)    
+
+
+    return redirect('gstr1')    
+        
+    
+
+
 
 # Ananthakrishnanend
 
@@ -28153,7 +28612,7 @@ def create_item(request):
             itax = request.POST['taxref']
             ipcost = request.POST['pcost']
             iscost = request.POST['salesprice']
-            itrate = request.POST['tax']
+            #itrate = request.POST['tax']
             ipuracc = request.POST['pur_account']
             isalacc = request.POST['sale_account']
             ipurdesc = request.POST['pur_desc']
@@ -28167,7 +28626,7 @@ def create_item(request):
                                 hsn=ihsn,tax_reference=itax,
                                 purchase_cost=ipcost,
                                 sales_cost=iscost,
-                                tax_rate=itrate,
+                                #tax_rate=itrate,
                                 acount_pur=ipuracc,
                                 account_sal=isalacc,
                                 pur_desc=ipurdesc,

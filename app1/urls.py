@@ -409,6 +409,11 @@ urlpatterns = [
     path('estmate_filter3',views.estmate_filter3,name='estmate_filter3'),
 
     path('estimate_pdf',views.estimate_pdf,name='estimate_pdf'),
+
+    path('new_customers1',views.new_customers1,name='new_customers1'),
+
+
+    
      
 
 
@@ -516,9 +521,11 @@ urlpatterns = [
 
     path('update_opening_balance/<int:id>',views.update_opening_balance,name='update_opening_balance'),
 
+    path('gstr11',views.gstr11,name='gstr11'),
+
 
     
-
+    
 
     
 
